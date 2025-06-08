@@ -23,8 +23,8 @@ export class AppointmentService {
     const appointment = this.appointmentRepository.create({
       clientName: createAppointmentDto.clientName,
       startTime: new Date(createAppointmentDto.startTime),
-      EndTime: new Date (createAppointmentDto.EndTime),
-      BarberId: createAppointmentDto.BarberId,
+      EndTime: new Date (createAppointmentDto.endTime),
+      BarberId: createAppointmentDto.barberId,
       service,
     });
 

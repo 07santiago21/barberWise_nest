@@ -1,1 +1,5 @@
-export class CreateServiceDto {}
+export class CreateServiceDto {
+    name: string;
+    price: number;
+    duration: number;
+}

@@ -5,7 +5,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 export class Service {
 
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id: number;
 
     @Column({ type: 'varchar'})
     name: string;

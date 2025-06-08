@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -30,5 +30,10 @@ export class AppointmentController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.appointmentService.remove(+id);
+  }
+
+  @Get()
+  async findByDate(@Query('date') date: string){
+    return this.appointmentService.findByDate(new Date(date));
   }
 }

@@ -5,6 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from './entities/appointment.entity';
 import { Between, Repository } from 'typeorm';
 import { Service } from 'src/service/entities/service.entity';
+import { startOfDay, endOfDay } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
+
 
 @Injectable()
 export class AppointmentService {
@@ -36,6 +39,102 @@ export class AppointmentService {
   findAll() {
     return this.appointmentRepository.find();
   }
+
+
+
+  async getNextAppointment(BarberId: string) {
+
+    const timeZone = 'America/Bogota';
+
+  // Obtener la hora actual en la zona de Colombia
+  const nowUTC = new Date();
+  const nowColombia = toZonedTime(nowUTC, timeZone);
+
+  // Obtener fin del día en zona Colombia
+  const endColombia = endOfDay(nowColombia);
+
+    const appointment = await this.appointmentRepository.findOne({
+      where: {
+        BarberId,
+        startTime: Between(nowColombia, endColombia),
+        },
+      order: {
+        startTime: 'ASC',
+      },
+      relations: ['service'],
+    });
+
+    if (!appointment) {
+      throw new Error('No hay citas disponibles para el día de hoy');
+    }
+
+    const { id, ...rest } = appointment;
+    return rest;
+
+
+  }
+
+  
+
+  async getDailySummary(barberId: string) {
+    const todayAppointments = await this.getTodayAppointments(barberId);
+
+    const totalTurns = this.getTotalTurns(todayAppointments);
+    const completedTurns = this.getCompletedTurns(todayAppointments);
+    const currentEarnings = this.getCurrentEarnings(todayAppointments);
+    const estimatedEarnings = this.getEstimatedEarnings(todayAppointments);
+
+    ;
+    return {
+      completedTurns,
+      totalTurns,
+      currentEarnings,
+      estimatedEarnings,
+    };
+  }
+
+  private async getTodayAppointments(barberId: string): Promise<Appointment[]> {
+    const now = new Date();
+    const start = startOfDay(now);
+    const end = endOfDay(now);
+
+    return this.appointmentRepository.find({
+      where: {
+        BarberId: barberId,
+        startTime: Between(start, end),
+      },
+      relations: ['service'],
+    });
+  }
+
+  private getTotalTurns(appointments: Appointment[]): number {
+    return appointments.length;
+  }
+
+  private getCompletedTurns(appointments: Appointment[]): number {
+    const now = new Date();
+    return appointments.filter(app => app.EndTime < now).length;
+  }
+
+  private getCurrentEarnings(appointments: Appointment[]): number {
+    const now = new Date();
+    return appointments
+      .filter(app => app.EndTime < now && app.service)
+      .reduce((sum, app) => sum + Number(app.service.price), 0);
+  }
+
+  private getEstimatedEarnings(appointments: Appointment[]): number {
+    return appointments
+      .filter(app => app.service)
+      .reduce((sum, app) => sum + Number(app.service.price), 0);
+  }
+
+
+  
+
+
+
+
 
   findOne(id: number) {
     return `This action returns a #${id} appointment`;

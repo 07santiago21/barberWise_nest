@@ -5,7 +5,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
 @Controller('appointment')
 export class AppointmentController {
-  constructor(private readonly appointmentService: AppointmentService) {}
+  constructor(private readonly appointmentService: AppointmentService) { }
 
   @Post()
   create(@Body() createAppointmentDto: CreateAppointmentDto) {
@@ -16,6 +16,23 @@ export class AppointmentController {
   findAll() {
     return this.appointmentService.findAll();
   }
+
+
+  @Get('next-appointment')
+  async nextAppointment() {
+    const barberId = 'barber123';
+    return this.appointmentService.getNextAppointment(barberId);
+  }
+
+  @Get('daily-summary')
+  async dailySummary() {
+    
+    const BarberId = 'barber123';
+    return this.appointmentService.getDailySummary(BarberId);
+  }
+
+
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -33,7 +50,7 @@ export class AppointmentController {
   }
 
   @Get()
-  async findByDate(@Query('date') date: string){
+  async findByDate(@Query('date') date: string) {
     return this.appointmentService.findByDate(new Date(date));
   }
 }

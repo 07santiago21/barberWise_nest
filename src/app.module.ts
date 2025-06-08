@@ -10,7 +10,7 @@ import { ServiceModule } from './service/service.module';
     
     TypeOrmModule.forRoot({
       type: 'postgres',  
-      url: '',
+      url: 'postgresql://postgres.ieydbuirtbpjsibrfaqk:Nacional0721*@aws-0-us-east-2.pooler.supabase.com:6543/postgres',
       autoLoadEntities:true,
       synchronize:true
       }

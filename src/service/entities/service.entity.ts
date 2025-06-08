@@ -1,10 +1,10 @@
 import { Appointment } from "src/appointment/entities/appointment.entity";
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Service {
 
-    @Column({ primary: true, generated: 'increment' })
+    @PrimaryGeneratedColumn('uuid')
     id: number;
 
     @Column({ type: 'varchar'})

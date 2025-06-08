@@ -5,7 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, ManyToOne } from 't
 @Entity()
 export class Appointment {
 
-    @Column({ primary: true, generated: 'increment' })
+    @PrimaryGeneratedColumn('uuid')
     id: number;
 
     @Column()

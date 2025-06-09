@@ -7,6 +7,7 @@ import { Between, Repository } from 'typeorm';
 import { Service } from 'src/service/entities/service.entity';
 import { startOfDay, endOfDay } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
+import { time } from 'console';
 
 
 @Injectable()
@@ -44,17 +45,13 @@ export class AppointmentService {
 
   async getNextAppointment(barberId: string) {
 
-    const timeZone = 'America/Bogota';
-
-    // Obtener la hora actual en la zona de Colombia
-    const nowUTC = new Date();
-    const nowColombia = toZonedTime(nowUTC, timeZone);
+    
+    const nowColombia = this.timeChange();
     const endColombia = endOfDay(nowColombia);
 
 
 
-    // Obtener fin del día en zona Colombia
-
+    
     const appointment = await this.appointmentRepository.findOne({
       where: {
         BarberId: barberId,
@@ -93,10 +90,6 @@ export class AppointmentService {
     const todayAppointments = await this.getTodayAppointments(barberId);
 
 
-
-    console.log('turnos que trae');
-    console.log('Today Appointments:', todayAppointments);
-
     const totalTurns = this.getTotalTurns(todayAppointments);
     const completedTurns = this.getCompletedTurns(todayAppointments);
     const currentEarnings = this.getCurrentEarnings(todayAppointments);
@@ -114,18 +107,13 @@ export class AppointmentService {
   private async getTodayAppointments(barberId: string): Promise<Appointment[]> {
 
 
-    const timeZone = 'America/Bogota';
-
-    const nowUTC = new Date();
-    const nowColombia = toZonedTime(nowUTC, timeZone);
+    const nowColombia = this.timeChange();
 
 
     const startDay = startOfDay (nowColombia);
     const endColombia = endOfDay(nowColombia);
 
 
-
-  
 
     return this.appointmentRepository.find({
       where: {
@@ -147,7 +135,9 @@ export class AppointmentService {
   }
 
   private getCurrentEarnings(appointments: Appointment[]): number {
-    const now = new Date();
+
+    const now = this.timeChange();
+;
     return appointments
       .filter(app => app.EndTime < now && app.service)
       .reduce((sum, app) => sum + Number(app.service.price), 0);
@@ -162,7 +152,13 @@ export class AppointmentService {
 
 
 
-
+  private timeChange(timeZone = 'America/Bogota'): Date {
+    
+    
+    const nowUTC = new Date();
+    const nowColombia = toZonedTime(nowUTC, timeZone);
+    return nowColombia
+  }
 
 
 

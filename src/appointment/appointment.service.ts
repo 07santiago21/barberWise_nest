@@ -162,9 +162,19 @@ export class AppointmentService {
 
 
 
-  findOne(id: number) {
-    return `This action returns a #${id} appointment`;
-  }
+ async findByBarberAndDateRange(barberId, startDate, endDate){
+  console.log(startDate, endDate);
+
+  return await this.appointmentRepository.find({
+      where: {
+        barberId,
+        startTime: Between(startDate, endDate)
+      },
+      order: { startTime: 'ASC' }
+    })
+
+ }
+
 
   update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
     return `This action updates a #${id} appointment`;

@@ -7,7 +7,6 @@ import { ServiceModule } from './service/service.module';
 
 @Module({
   imports: [
-    
     TypeOrmModule.forRoot({
       type: 'postgres',  
       url: 'postgresql://postgres.mpkiuqarhumxvsbknbpa:CdsVN9HPUpgSALbT@aws-0-us-east-2.pooler.supabase.com:5432/postgres',
@@ -15,6 +14,7 @@ import { ServiceModule } from './service/service.module';
       synchronize:true
       }
     ),
+    
     
     
     AppointmentModule,

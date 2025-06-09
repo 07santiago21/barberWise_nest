@@ -12,6 +12,7 @@ export class AppointmentController {
     return this.appointmentService.create(createAppointmentDto);
   }
 
+  
 
 
   @Get('next-appointment/:barberId')
@@ -69,14 +70,8 @@ export class AppointmentController {
   }
 
   @Get()
-  async findByDate(@Query('date') date: string) {
-    return this.appointmentService.findByDate(new Date(date));
+  async findByDate(@Query('date') date: string, @Query('barber_id') id: string) {
+    return this.appointmentService.findByDate(new Date(date), id);
   }
 
-
-
-  @Get()
-  findAll() {
-    return this.appointmentService.findAll();
-  }
 }

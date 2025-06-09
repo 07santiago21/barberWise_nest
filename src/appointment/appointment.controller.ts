@@ -18,17 +18,17 @@ export class AppointmentController {
   }
 
 
-  @Get('next-appointment')
-  async nextAppointment() {
-    const barberId = 'barber123';
+  @Get('next-appointment/:barberId')
+  async nextAppointment(@Param('barberId') barberId: string) {
+
     return this.appointmentService.getNextAppointment(barberId);
+  
   }
 
-  @Get('daily-summary')
-  async dailySummary() {
+  @Get('daily-summary/:barberId')
+  async dailySummary(@Param('barberId') barberId: string) {
     
-    const BarberId = 'barber123';
-    return this.appointmentService.getDailySummary(BarberId);
+    return this.appointmentService.getDailySummary(barberId);
   }
 
 

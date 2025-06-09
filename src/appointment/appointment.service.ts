@@ -42,7 +42,7 @@ export class AppointmentService {
 
 
 
-  async getNextAppointment(BarberId: string) {
+  async getNextAppointment(barberId: string) {
 
     const timeZone = 'America/Bogota';
 
@@ -55,7 +55,7 @@ export class AppointmentService {
 
     const appointment = await this.appointmentRepository.findOne({
       where: {
-        BarberId,
+        BarberId:barberId,
         startTime: Between(nowColombia, endColombia),
         },
       order: {
@@ -68,8 +68,19 @@ export class AppointmentService {
       throw new Error('No hay citas disponibles para el día de hoy');
     }
 
-    const { id, ...rest } = appointment;
-    return rest;
+    
+
+    const {id,EndTime, service,BarberId ,...rest  } = appointment;
+
+    const nextAppointment = {
+      ...rest,
+      endTime: EndTime,
+      barberId: BarberId,
+      serviceId: service.id,
+      service: service,
+    };
+    return nextAppointment
+;
 
 
   }

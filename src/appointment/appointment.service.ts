@@ -13,20 +13,20 @@ import { toZonedTime } from 'date-fns-tz';
 export class AppointmentService {
 
   constructor(
-    @InjectRepository(Appointment) private appointmentRepository:Repository<Appointment>,
-    @InjectRepository(Service) private serviceRepository: Repository<Service>) {}
+    @InjectRepository(Appointment) private appointmentRepository: Repository<Appointment>,
+    @InjectRepository(Service) private serviceRepository: Repository<Service>) { }
 
   async create(createAppointmentDto: CreateAppointmentDto): Promise<Appointment> {
-    const service = await this.serviceRepository.findOneBy({ id: createAppointmentDto.serviceId});
+    const service = await this.serviceRepository.findOneBy({ id: createAppointmentDto.serviceId });
 
-    if (!service){
+    if (!service) {
       throw new Error(`Servicio con ID ${createAppointmentDto.serviceId} no encontrado`)
     }
 
     const appointment = this.appointmentRepository.create({
       clientName: createAppointmentDto.clientName,
       startTime: new Date(createAppointmentDto.startTime),
-      EndTime: new Date (createAppointmentDto.endTime),
+      EndTime: new Date(createAppointmentDto.endTime),
       BarberId: createAppointmentDto.barberId,
       service,
     });
@@ -46,18 +46,20 @@ export class AppointmentService {
 
     const timeZone = 'America/Bogota';
 
-  // Obtener la hora actual en la zona de Colombia
-  const nowUTC = new Date();
-  const nowColombia = toZonedTime(nowUTC, timeZone);
+    // Obtener la hora actual en la zona de Colombia
+    const nowUTC = new Date();
+    const nowColombia = toZonedTime(nowUTC, timeZone);
+    const endColombia = endOfDay(nowColombia);
 
-  // Obtener fin del día en zona Colombia
-  const endColombia = endOfDay(nowColombia);
+
+
+    // Obtener fin del día en zona Colombia
 
     const appointment = await this.appointmentRepository.findOne({
       where: {
-        BarberId:barberId,
+        BarberId: barberId,
         startTime: Between(nowColombia, endColombia),
-        },
+      },
       order: {
         startTime: 'ASC',
       },
@@ -68,9 +70,9 @@ export class AppointmentService {
       throw new Error('No hay citas disponibles para el día de hoy');
     }
 
-    
 
-    const {id,EndTime, service,BarberId ,...rest  } = appointment;
+
+    const { id, EndTime, service, BarberId, ...rest } = appointment;
 
     const nextAppointment = {
       ...rest,
@@ -80,15 +82,20 @@ export class AppointmentService {
       service: service,
     };
     return nextAppointment
-;
+      ;
 
 
   }
 
-  
+
 
   async getDailySummary(barberId: string) {
     const todayAppointments = await this.getTodayAppointments(barberId);
+
+
+
+    console.log('turnos que trae');
+    console.log('Today Appointments:', todayAppointments);
 
     const totalTurns = this.getTotalTurns(todayAppointments);
     const completedTurns = this.getCompletedTurns(todayAppointments);
@@ -105,17 +112,29 @@ export class AppointmentService {
   }
 
   private async getTodayAppointments(barberId: string): Promise<Appointment[]> {
-    const now = new Date();
-    const start = startOfDay(now);
-    const end = endOfDay(now);
+
+
+    const timeZone = 'America/Bogota';
+
+    const nowUTC = new Date();
+    const nowColombia = toZonedTime(nowUTC, timeZone);
+
+
+    const startDay = startOfDay (nowColombia);
+    const endColombia = endOfDay(nowColombia);
+
+
+
+  
 
     return this.appointmentRepository.find({
       where: {
         BarberId: barberId,
-        startTime: Between(start, end),
+        startTime: Between(startDay, endColombia),
       },
       relations: ['service'],
     });
+
   }
 
   private getTotalTurns(appointments: Appointment[]): number {
@@ -141,7 +160,7 @@ export class AppointmentService {
   }
 
 
-  
+
 
 
 
@@ -159,15 +178,15 @@ export class AppointmentService {
     return `This action removes a #${id} appointment`;
   }
 
-  async findByDate(date:Date): Promise<Appointment[]>{
-    const start = new Date(date.toISOString().split('T')[0]+'T00:00:00.000Z')
-    const end = new Date(date.toISOString().split('T')[0]+'T23:59:59.999Z')
+  async findByDate(date: Date): Promise<Appointment[]> {
+    const start = new Date(date.toISOString().split('T')[0] + 'T00:00:00.000Z')
+    const end = new Date(date.toISOString().split('T')[0] + 'T23:59:59.999Z')
 
     return await this.appointmentRepository.find({
       where: {
         startTime: Between(start, end)
       },
-      order: {startTime: 'ASC'}
+      order: { startTime: 'ASC' }
     })
   }
 }

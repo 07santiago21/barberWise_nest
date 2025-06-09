@@ -37,9 +37,6 @@ export class AppointmentService {
 
   }
 
-  findAll() {
-    return this.appointmentRepository.find();
-  }
 
 
 
@@ -174,13 +171,14 @@ export class AppointmentService {
     return `This action removes a #${id} appointment`;
   }
 
-  async findByDate(date: Date): Promise<Appointment[]> {
+  async findByDate(date: Date, id: string): Promise<Appointment[]> {
     const start = new Date(date.toISOString().split('T')[0] + 'T00:00:00.000Z')
     const end = new Date(date.toISOString().split('T')[0] + 'T23:59:59.999Z')
 
     return await this.appointmentRepository.find({
       where: {
-        startTime: Between(start, end)
+        barberId: id,
+        startTime: Between(start, end),
       },
       order: { startTime: 'ASC' }
     })

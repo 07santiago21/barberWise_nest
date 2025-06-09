@@ -15,10 +15,10 @@ export class Appointment {
     startTime: Date;
 
     @Column()
-    EndTime: Date;
+    endTime: Date;
 
     @Column()
-    BarberId: string;
+    barberId: string;
 
 
     @ManyToOne(() => Service, (service) => service.appointments, { eager: true })

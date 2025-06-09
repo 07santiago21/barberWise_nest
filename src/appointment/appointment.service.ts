@@ -27,8 +27,8 @@ export class AppointmentService {
     const appointment = this.appointmentRepository.create({
       clientName: createAppointmentDto.clientName,
       startTime: new Date(createAppointmentDto.startTime),
-      EndTime: new Date(createAppointmentDto.endTime),
-      BarberId: createAppointmentDto.barberId,
+      endTime: new Date(createAppointmentDto.endTime),
+      barberId: createAppointmentDto.barberId,
       service,
     });
 
@@ -43,7 +43,7 @@ export class AppointmentService {
 
 
 
-  async getNextAppointment(barberId: string) {
+  async getNextAppointment(BarberId: string) {
 
     
     const nowColombia = this.timeChange();
@@ -54,7 +54,7 @@ export class AppointmentService {
     
     const appointment = await this.appointmentRepository.findOne({
       where: {
-        BarberId: barberId,
+        barberId:BarberId,
         startTime: Between(nowColombia, endColombia),
       },
       order: {
@@ -69,12 +69,12 @@ export class AppointmentService {
 
 
 
-    const { id, EndTime, service, BarberId, ...rest } = appointment;
+    const { id, endTime, service, barberId, ...rest } = appointment;
 
     const nextAppointment = {
       ...rest,
-      endTime: EndTime,
-      barberId: BarberId,
+      endTime: endTime,
+      barberId: barberId,
       serviceId: service.id,
       service: service,
     };
@@ -117,7 +117,7 @@ export class AppointmentService {
 
     return this.appointmentRepository.find({
       where: {
-        BarberId: barberId,
+        barberId,
         startTime: Between(startDay, endColombia),
       },
       relations: ['service'],
@@ -131,7 +131,7 @@ export class AppointmentService {
 
   private getCompletedTurns(appointments: Appointment[]): number {
     const now = new Date();
-    return appointments.filter(app => app.EndTime < now).length;
+    return appointments.filter(app => app.endTime < now).length;
   }
 
   private getCurrentEarnings(appointments: Appointment[]): number {
@@ -139,7 +139,7 @@ export class AppointmentService {
     const now = this.timeChange();
 ;
     return appointments
-      .filter(app => app.EndTime < now && app.service)
+      .filter(app => app.endTime < now && app.service)
       .reduce((sum, app) => sum + Number(app.service.price), 0);
   }
 
